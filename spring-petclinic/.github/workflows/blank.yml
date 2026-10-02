@@ -1,0 +1,23 @@
+name: Greeting Action Test
+
+'on':
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  greet:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run custom greeting action
+        id: greeting
+        uses: ./actions/greeting
+        with:
+          username: Alice
+          greeting: Bonjour
+
+      - name: Display greeting output
+        run: "echo \"Message from action: ${{ steps.greeting.outputs.message }}\""

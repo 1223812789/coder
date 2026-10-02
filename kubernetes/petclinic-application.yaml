@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: petclinic
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: spring-petclinic=ghcr.io/1223812789/spring-petclinic:~4.0
+    argocd-image-updater.argoproj.io/spring-petclinic.update-strategy: semver
+    argocd-image-updater.argoproj.io/spring-petclinic.helm.image-tag: image.tag
+    argocd-image-updater.argoproj.io/write-back-method: git
+    argocd-image-updater.argoproj.io/git-branch: main
+    argocd-image-updater.argoproj.io/write-back-target: helmvalues:/values_pp.yaml
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/1223812789/helm.git
+    targetRevision: HEAD
+    path: .
+    helm:
+      valueFiles:
+        - values.yaml
+        - values_pp.yaml
+      parameters:
+        - name: app.contextPath
+          value: /tp11
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: tp11-updater
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
